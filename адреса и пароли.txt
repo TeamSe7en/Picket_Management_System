@@ -1,0 +1,13 @@
+***адрес редактирования на сервере
+https://www.pythonanywhere.com/user/Se7enTeam/consoles/
+username: Se7enTeam 
+emale: latsynn@mail.ru 
+password: 777
+
+***адрес web сайта
+http://se7enteam.pythonanywhere.com/admin/
+username: admin
+password: admin
+
+***адрес туториала djangogirls
+https://tutorial.djangogirls.org/ru/
