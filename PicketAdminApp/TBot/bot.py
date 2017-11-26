@@ -47,9 +47,3 @@ def survey_of_picketers(list_of_id_user):
         if value == 'да':
             id_finall.append(key)
     return id_finall
-
-
-if __name__ == '__main__':
-    result = survey_of_picketers(BotConfig.id)
-    print(result)
-    # bot.polling(none_stop=True, interval=3)
