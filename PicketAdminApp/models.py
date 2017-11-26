@@ -35,7 +35,7 @@ class Person(models.Model):
     station = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
-        return self.surname+' '+self.name+' '+self.patronymic
+        return self.surname+' '+self.name
 
 
 class Place(models.Model):
@@ -53,7 +53,8 @@ class Place(models.Model):
 class Picket(models.Model):
     date = models.DateField(unique=True)
     text = models.TextField()
-    place_list = models.FileField()
+    place_list = models.FileField(null=True, blank=True)
+    person_list = models.FileField(null=True, blank=True)
 
     def __str__(self):
         return str(self.date)
