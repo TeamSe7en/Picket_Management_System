@@ -16,7 +16,7 @@ class Post(models.Model):
         self.save()
 
     def __str__(self):
-        return self.title
+        return str(self.title)
 
 
 #class Metrostation(models.Model):
@@ -28,14 +28,14 @@ class Post(models.Model):
 
 
 class Person(models.Model):
-    telegram_id = models.BigIntegerField(primary_key=True)
+    telegram_id = models.BigIntegerField(primary_key = True)
     name = models.CharField(max_length=20)
     surname = models.CharField(max_length=20)
     patronymic = models.CharField(max_length=20, null = True, blank=True)
     station = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
-        return self.surname+' '+self.name
+        return str(self.surname)+' '+str(self.name)
 
 
 class Place(models.Model):
@@ -47,7 +47,7 @@ class Place(models.Model):
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return self.shortname
+        return str(self.shortname)
 
 
 class Picket(models.Model):
@@ -55,15 +55,39 @@ class Picket(models.Model):
     text = models.TextField()
     place_list = models.FileField(null=True, blank=True)
     person_list = models.FileField(null=True, blank=True)
+    places = []
 
     def __str__(self):
         return str(self.date)
 
 
 class Spot(models.Model):
+    #person = models.ForeignKey(Person, db_constraint = False, null=True, blank=True)
     person = models.ForeignKey(Person)
+    #person = models.ManyToOneRel(Person)
     picket = models.ForeignKey(Picket)
     place = models.ForeignKey(Place)
 
     def __str__(self):
-        return self.person.surname+' '+str(self.picket.date)+' '+self.place.shortname
+        return str(self.person.surname)+' '+str(self.picket.date)+' '+str(self.place.shortname)
+
+        #return str(self.picket.date) + ' ' + self.place.shortname
+
+
+class Task(models.Model):
+    POLL_PICKET = 'poll_picket'
+    ACCEPT_PICKET = 'accept_picket'
+    INFO_PICKET = 'info_picket'
+    GEO_PICKET = 'geo_picket'
+    TASK_CHOICES = (
+        (POLL_PICKET, "poll picket"),
+        (ACCEPT_PICKET, "accept picket"),
+        (INFO_PICKET , 'info picket'),
+        (GEO_PICKET , 'geo picket')
+    )
+    name = models.CharField(max_length=20,choices=TASK_CHOICES)
+    status = models.BooleanField(default=True)
+    date = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.name}"
