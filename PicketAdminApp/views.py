@@ -42,6 +42,7 @@ def add_person(request):
     #person.save()
     return HttpResponse(status=200)
 
+@csrf_exempt
 def set_person_for_picket(request):
     info_to_set = json.loads(request.body)
     try:
@@ -51,23 +52,23 @@ def set_person_for_picket(request):
         return HttpResponse(status=200)
     except Picket.DoesNotExist:
         print('нет пикета с этой датой')
-        return HttpResponse(status=500)
+        return HttpResponse(status=520)
     except Picket. MultipleObjectsReturned:
         print('существует несколько пикетов с этой датой')
-        return HttpResponse(status=500)
+        return HttpResponse(status=520)
 
-
+@csrf_exempt
 def task_complete(request):
     info_to_completion = json.loads(request.body)
     id_task = info_to_completion['id']
     try:
-        task = Task.objects.get(id = id_task)
-        task.update(status = False)
+        task = Task.objects.get(id=id_task)
+        task.status=False
+        task.save()
         return HttpResponse(status=200)
     except Task.DoesNotExist:
         print('нет задачи с этой датой')
-        return HttpResponse(status=500)
+        return HttpResponse(status=520)
     except Task.MultipleObjectsReturned:
         print('существует несколько задач с этим id')
-        return HttpResponse(status=500)
-
+        return HttpResponse(status=520)

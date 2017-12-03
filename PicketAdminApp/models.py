@@ -59,7 +59,7 @@ class Picket(models.Model):
     persons = []
 
     def __str__(self):
-        return str(self.date)
+        return str(self.date)+str(self.persons)+str(self.places)
 
 
 class Spot(models.Model):

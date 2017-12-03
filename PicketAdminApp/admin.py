@@ -15,6 +15,8 @@ class PicketAdmin(admin.ModelAdmin):
                 id_list.append(p.telegram_id)
             task = Task.objects.get_or_create(name = 'poll_picket',
                                               data = str(picket.date))[0]
+            task.status = True
+            task.save()
         #survey_of_picketers(id_list)
             self.message_user(request, 'Разослано приглашение на пикет: ' + task.data)
     offer_a_job.short_description = "Выслать приглашение на работу"
@@ -62,9 +64,9 @@ class PicketAdmin(admin.ModelAdmin):
                                         description=row['description'])
                 #Spot.objects.get_or_create(picket = picket,
                                             #place = new_place)
-                if new_place[1] == True:
-                    picket.places.append(new_place[0])
-                picket.save()
+
+                picket.places.append(new_place[0])
+            picket.save()
         return_str = ", ".join(str(x) for x in picket.places)
         self.message_user(request, 'Места: ' + return_str)
     parse_place_list.short_description = "Добавить места пикета из файла"

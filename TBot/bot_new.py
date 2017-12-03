@@ -65,7 +65,7 @@ def survey_of_picketers(picket_date):
     for id_for_questoin in list_of_id_user:
         sent = bot.send_message(id_for_questoin, "Готов завтра работать?", reply_markup=markup)
         bot.register_next_step_handler(sent, answer_survey_of_picketers)
-    timer_for_polling(time=3, interval_polling=3)
+    timer_for_polling(time=5, interval_polling=3)
     json = {}
     json['agree_persons'] = agree_persons
     json['picket_date'] = picket_date
@@ -119,7 +119,7 @@ task_types = {
 
 if __name__ == '__main__':
     while True:
-        timer_for_polling(time=3, interval_polling=3)
+        timer_for_polling(time=5, interval_polling=3)
         r = requests.get(f"{server_url}/tasks/")
         if (r.status_code == 200): #чтоб не крашился, когда нет задач
             task_type_name = r.json()["task"]
@@ -128,7 +128,9 @@ if __name__ == '__main__':
             task_id = r.json()["id"]
             print(task_id)
             task_func(task_data)
-            r = requests.post(f'{server_url}/task_complete/', json = {'id':task_id})
+            json_complete = {}
+            json_complete['id'] = task_id
+            r = requests.post(f'{server_url}/task_complete/', json = json_complete)
             #requests.post(f'{server_url}/task_complete/', data=task_id)
             print(r.status_code)
         else:

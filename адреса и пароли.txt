@@ -11,3 +11,7 @@ password: admin
 
 ***адрес туториала djangogirls
 https://tutorial.djangogirls.org/ru/
+
+python manage.py makemigrations PicketAdminApp
+python manage.py migrate
+python manage.py runserver
