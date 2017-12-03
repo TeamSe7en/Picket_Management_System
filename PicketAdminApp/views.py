@@ -14,10 +14,12 @@ def post_list(request):
 
 def check_task(request):
     task = Task.objects.filter(status=True).first()
-    task_json = json.dumps({'task':task.name})
+    task_json = json.dumps({'id':task.id,
+                            'task':task.name,
+                            'task_data':task.data})
     return HttpResponse(task_json, content_type='application/json')
 
-def check_data(request):
+def all_person(request):
     data_person = Person.objects.all()
     data = [person.telegram_id for person in data_person]
 
@@ -39,3 +41,33 @@ def add_person(request):
     #person = Person(telegram_id=123121, name=name, surname='gustav', patronymic='lol', station='baumanskaya')
     #person.save()
     return HttpResponse(status=200)
+
+def set_person_for_picket(request):
+    info_to_set = json.loads(request.body)
+    try:
+        picket = Picket.objects.get(info_to_set['picket_date'])
+        picket.persons = info_to_set['agree_persons']
+        picket.save()
+        return HttpResponse(status=200)
+    except Picket.DoesNotExist:
+        print('нет пикета с этой датой')
+        return HttpResponse(status=500)
+    except Picket. MultipleObjectsReturned:
+        print('существует несколько пикетов с этой датой')
+        return HttpResponse(status=500)
+
+
+def task_complete(request):
+    info_to_completion = json.loads(request.body)
+    id_task = info_to_completion['id']
+    try:
+        task = Task.objects.get(id = id_task)
+        task.update(status = False)
+        return HttpResponse(status=200)
+    except Task.DoesNotExist:
+        print('нет задачи с этой датой')
+        return HttpResponse(status=500)
+    except Task.MultipleObjectsReturned:
+        print('существует несколько задач с этим id')
+        return HttpResponse(status=500)
+

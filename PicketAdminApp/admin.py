@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Place, Picket, Spot, Task
-from .models import Person
+from .models import Place, Picket, Spot, Task, Person
 
 
 class PicketAdmin(admin.ModelAdmin):
@@ -9,12 +8,15 @@ class PicketAdmin(admin.ModelAdmin):
     actions = ['offer_a_job', 'parse_place_list', 'parse_person_list']
 
     def offer_a_job(self, request, queryset):
-        person_list = Person.objects.all()
-        id_list = []
-        for p in person_list:
-            id_list.append(p.telegram_id)
+        for picket in queryset:
+            person_list = Person.objects.all()
+            id_list = []
+            for p in person_list:
+                id_list.append(p.telegram_id)
+            task = Task.objects.get_or_create(name = 'poll_picket',
+                                              data = str(picket.date))[0]
         #survey_of_picketers(id_list)
-        #self.message_user(request, 'Список согласившихся: '+str(id_list))
+            self.message_user(request, 'Разослано приглашение на пикет: ' + task.data)
     offer_a_job.short_description = "Выслать приглашение на работу"
 
     def parse_person_list(self, request, queryset):
@@ -62,7 +64,7 @@ class PicketAdmin(admin.ModelAdmin):
                                             #place = new_place)
                 if new_place[1] == True:
                     picket.places.append(new_place[0])
-
+                picket.save()
         return_str = ", ".join(str(x) for x in picket.places)
         self.message_user(request, 'Места: ' + return_str)
     parse_place_list.short_description = "Добавить места пикета из файла"

@@ -56,6 +56,7 @@ class Picket(models.Model):
     place_list = models.FileField(null=True, blank=True)
     person_list = models.FileField(null=True, blank=True)
     places = []
+    persons = []
 
     def __str__(self):
         return str(self.date)
@@ -85,9 +86,10 @@ class Task(models.Model):
         (INFO_PICKET , 'info picket'),
         (GEO_PICKET , 'geo picket')
     )
+    id = models.AutoField(primary_key = True)
     name = models.CharField(max_length=20,choices=TASK_CHOICES)
     status = models.BooleanField(default=True)
     date = models.DateField(default=timezone.now)
-
+    data = models.CharField(max_length=200,null=True, blank=True)
     def __str__(self):
-        return f"{self.name}"
+        return str(self.name) + " "+ str(self.date)
