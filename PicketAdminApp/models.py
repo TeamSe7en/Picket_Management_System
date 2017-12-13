@@ -55,11 +55,13 @@ class Picket(models.Model):
     text = models.TextField()
     place_list = models.FileField(null=True, blank=True)
     person_list = models.FileField(null=True, blank=True)
-    places = []
-    persons = []
+    places = models.ManyToManyField(Place,null=True, blank=True)
+    persons = models.ManyToManyField(Person,null=True, blank=True)
+
+
 
     def __str__(self):
-        return str(self.date)+str(self.persons)+str(self.places)
+        return str(self.date)+str(self.places.all())#+str(self.persons)+str(self.places)
 
 
 class Spot(models.Model):

@@ -33,11 +33,13 @@ class PicketAdmin(admin.ModelAdmin):
                     rows.append(row)
 
             for row in rows:
-                Person.objects.get_or_create(telegram_id=row['telegram_id'],
-                                            name = row['name'],
-                                             surname = row['surname'],
-                                             patronymic = row['patronymic'],
-                                             station = row['station'])
+                person = Person.objects.get_or_create(telegram_id=row['telegram_id'])[0]
+                person.name = row['name']
+                person.surname = row['surname']
+                person.patronymic = row['patronymic']
+                person.station = row['station']
+                person.save()
+
         self.message_user(request, 'Пикетчики: ' + str(Person.objects.all()))
 
     parse_person_list.short_description = "Добавить новых пикетчиков из файла"
@@ -65,9 +67,9 @@ class PicketAdmin(admin.ModelAdmin):
                 #Spot.objects.get_or_create(picket = picket,
                                             #place = new_place)
 
-                picket.places.append(new_place[0])
+                picket.places.add(new_place[0])
             picket.save()
-        return_str = ", ".join(str(x) for x in picket.places)
+        return_str = ", ".join(str(x) for x in picket.places.all())
         self.message_user(request, 'Места: ' + return_str)
     parse_place_list.short_description = "Добавить места пикета из файла"
 

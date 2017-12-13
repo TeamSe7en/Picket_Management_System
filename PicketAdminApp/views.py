@@ -46,8 +46,11 @@ def add_person(request):
 def set_person_for_picket(request):
     info_to_set = json.loads(request.body)
     try:
-        picket = Picket.objects.get(info_to_set['picket_date'])
-        picket.persons = info_to_set['agree_persons']
+        picket = Picket.objects.get(date = info_to_set['picket_date'])
+        persons_id = info_to_set['agree_persons']
+        for p_id in persons_id:
+            person = Person.objects.get(telegram_id = p_id)
+            picket.persons.add(person)
         picket.save()
         return HttpResponse(status=200)
     except Picket.DoesNotExist:

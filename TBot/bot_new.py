@@ -3,6 +3,7 @@ from threading import Timer
 import time
 import requests
 import json
+import  asyncio
 
 token = '496675869:AAEh3Y-XKUe4eJNcMNXY0rzvOEKbcqRxxC8'
 id = ['190120461','481050042']#, '276795899']  # ,'147572829','190120461']##,'90527817']#,'74534494']
@@ -11,6 +12,10 @@ answer_users = {}
 users_location = {}
 add_person = {}
 time_now = time.time()
+
+last_survey_of_picketers_time = 0
+time_for_answer_to_picket = 30  #30 seconds
+
 bot = telebot.TeleBot(token)
 server_url = 'http://127.0.0.1:8000'
 #server_url = 'http://Se7enTeam.pythonanywhere.com'
@@ -57,24 +62,39 @@ def timer_for_polling(time=300, interval_polling=3):
     bot.polling(none_stop=True, interval=interval_polling)
 
 
-def survey_of_picketers(picket_date):
+async def survey_of_picketers(picket_date):
+    global agree_persons
+    agree_persons = []
     markup = telebot.types.ReplyKeyboardMarkup(True, True)
     markup.row('да', 'нет')
     r = requests.get(f"{server_url}/all_person/")
     list_of_id_user = r.json()["id_person"]
+    global last_survey_of_picketers_time
+    last_survey_of_picketers_time = time.time()
+    print(last_survey_of_picketers_time)
+
     for id_for_questoin in list_of_id_user:
         sent = bot.send_message(id_for_questoin, "Готов завтра работать?", reply_markup=markup)
         bot.register_next_step_handler(sent, answer_survey_of_picketers)
-    timer_for_polling(time=5, interval_polling=3)
+    #timer_for_polling(time=5, interval_polling=3)
+    await asyncio.sleep(time_for_answer_to_picket)
     json = {}
     json['agree_persons'] = agree_persons
     json['picket_date'] = picket_date
     requests.post(f'{server_url}/person_for_picket/', json = json)
+
     print(json)
 
 def answer_survey_of_picketers(message):
+    global last_survey_of_picketers_time
     if message.text == 'да':
-        agree_persons.append(message.chat.id)
+        if time.time() - last_survey_of_picketers_time < time_for_answer_to_picket:
+            agree_persons.append(message.chat.id)
+            bot.send_message(message.chat.id, "Отлично! Сейчас подберем тебе местечко")
+        else:
+            bot.send_message(message.chat.id, "Эээххх... не успел ты =( сорян бартан...")
+    else:
+        bot.send_message(message.chat.id, "Ну, как хочешь. Я предлагал ... ")
 
 
 def survey_of_geolocation():
@@ -128,6 +148,7 @@ if __name__ == '__main__':
             task_id = r.json()["id"]
             print(task_id)
             task_func(task_data)
+            asyncio.wait(task_func)
             json_complete = {}
             json_complete['id'] = task_id
             r = requests.post(f'{server_url}/task_complete/', json = json_complete)
