@@ -5,7 +5,7 @@ from .models import Place, Picket, Spot, Task, Person
 class PicketAdmin(admin.ModelAdmin):
     #list_display = ['title', 'status']
     #ordering = ['title']
-    actions = ['offer_a_job', 'parse_place_list', 'parse_person_list', 'set_allocation']
+    actions = ['offer_a_job', 'parse_place_list', 'parse_person_list', 'set_allocation','inform_persons']
 
     def offer_a_job(self, request, queryset):
         for picket in queryset:
@@ -80,7 +80,35 @@ class PicketAdmin(admin.ModelAdmin):
             from Allocation import allocation
             result = allocation.allocation(persons,places)
             self.message_user(request, str (result))
+
+            #запись в Spot
+            matches = result['matches']
+            for place in matches:
+                Spot.objects.get_or_create(picket = picket, place = place, person = matches[place])
+            places_excess = result['places_excess']
+            for place in places_excess:
+                Spot.objects.get_or_create(picket=picket, place=place)
+            persons_excess = result['persons_excess']
+            for person in persons_excess:
+                Spot.objects.get_or_create(picket = picket,person = person)
     set_allocation.short_description = "Распределить людей по местам"
+
+
+    def inform_persons(self, request, queryset):
+        for picket in queryset:
+            data = {}
+            data['date'] = picket.date
+            data['text'] = picket.text
+            data['spots'] = {}
+            for spot in Spot.objects.filter(picket = picket):
+                data['spots'][spot.person] = spot.place
+            task = Task.objects.get_or_create(name='info_picket',
+                                              data=str(data))[0]
+            task.status = True
+            task.save()
+        self.message_user(request, 'Разослана информация о пикете: ' + task.data)
+    inform_persons.short_description = "Сообщить условия пикета"
+
 
 admin.site.register(Picket, PicketAdmin)
 admin.site.register(Person)

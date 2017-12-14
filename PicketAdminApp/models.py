@@ -72,13 +72,18 @@ class Picket(models.Model):
 
 class Spot(models.Model):
     #person = models.ForeignKey(Person, db_constraint = False, null=True, blank=True)
-    person = models.ForeignKey(Person)
+    person = models.ForeignKey(Person, blank=True,null=True)
     #person = models.ManyToOneRel(Person)
     picket = models.ForeignKey(Picket)
-    place = models.ForeignKey(Place)
+    place = models.ForeignKey(Place,blank=True,null=True)
 
     def __str__(self):
-        return str(self.person.surname)+' '+str(self.picket.date)+' '+str(self.place.shortname)
+        if self.person == None:
+            return str('Не назначено')+' / '+str(self.picket.date)+' / '+str(self.place.shortname)
+        elif self.place == None:
+            return str(self.person.surname)+' / '+str(self.picket.date)+' / '+str('Не назначено')
+        else:
+            return str(self.person.surname)+' / '+str(self.picket.date)+' / '+str(self.place.shortname)
 
         #return str(self.picket.date) + ' ' + self.place.shortname
 
