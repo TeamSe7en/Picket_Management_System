@@ -20,6 +20,18 @@ bot = telebot.TeleBot(token)
 server_url = 'http://127.0.0.1:8000'
 #server_url = 'http://Se7enTeam.pythonanywhere.com'
 
+@bot.message_handler(commands=['aboutme'])
+def aboutme(message):
+    json = {}
+    json['id'] = message.chat.id
+    r = requests.post(f"{server_url}/about_person/",json = json)
+    name = r.json()['name']
+    surname = r.json()['surname']
+    patronymic = r.json()['patronymic']
+    station = r.json()['station']
+    bot.send_message(message.chat.id,'Ты зарегистрирован как: '+
+                                        surname + ' '+name+ ' '+patronymic+
+                                        '. Ближайшая станция метро: '+station)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -148,7 +160,7 @@ if __name__ == '__main__':
             task_id = r.json()["id"]
             print(task_id)
             task_func(task_data)
-            asyncio.wait(task_func)
+            #asyncio.wait(task_func)
             json_complete = {}
             json_complete['id'] = task_id
             r = requests.post(f'{server_url}/task_complete/', json = json_complete)

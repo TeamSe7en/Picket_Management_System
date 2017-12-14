@@ -1,5 +1,11 @@
 from django.db import models
 from django.utils import timezone
+from Allocation import metro_stations
+
+with open('metro.dat', 'rb') as f:
+    graph_metro = metro_stations.pickle.load(f)
+    metro_list = list(graph_metro.vertices)
+    STATION_LIST = [(metro,metro) for metro in metro_list]
 
 
 class Post(models.Model):
@@ -32,7 +38,7 @@ class Person(models.Model):
     name = models.CharField(max_length=20)
     surname = models.CharField(max_length=20)
     patronymic = models.CharField(max_length=20, null = True, blank=True)
-    station = models.CharField(max_length=20, null=True, blank=True)
+    station = models.CharField(max_length=50, null=True, blank=True, choices= STATION_LIST)
 
     def __str__(self):
         return str(self.surname)+' '+str(self.name)
@@ -43,7 +49,7 @@ class Place(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     shortname = models.CharField(max_length=20)
-    metro = models.CharField(max_length=20)
+    metro = models.CharField(max_length=50, choices= STATION_LIST)
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):

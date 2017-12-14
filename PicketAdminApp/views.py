@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.utils import timezone
-from .models import Picket, Task, Person
+from .models import Picket, Task, Person,STATION_LIST
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -31,9 +31,19 @@ def add_person(request):
     #data = request.POST.get()
     #name = request.POST.get('name')
     info_to_add = json.loads(request.body)
-    new_person = Person(telegram_id=info_to_add['person_id'], name=info_to_add['name'],
-                        surname=info_to_add['surname'], patronymic=info_to_add['patronymic'],
-                        station=info_to_add['metro'])
+    new_person = Person(telegram_id=info_to_add['person_id'],
+        name=info_to_add['name'],
+        surname=info_to_add['surname'])
+    new_person.patronymic=info_to_add['patronymic']
+
+    if STATION_LIST.count(info_to_add['metro']) == 0:
+        for station in STATION_LIST:
+            if station[1].find(info_to_add['metro'])!= -1:
+                new_person.station = station[1]
+                break
+    else:
+        new_person.station=info_to_add['metro']
+
     new_person.save()
     print(info_to_add)
     #old_person = Person.objects.get(telegram_id=123121)
@@ -75,3 +85,14 @@ def task_complete(request):
     except Task.MultipleObjectsReturned:
         print('существует несколько задач с этим id')
         return HttpResponse(status=520)
+
+@csrf_exempt
+def about_person(request):
+    who = json.loads(request.body)
+    id_person = who['id']
+    person = Person.objects.get(telegram_id=id_person)
+    data_json = json.dumps({'name': person.name,
+                            'surname': person.surname,
+                            'patronymic': person.patronymic,
+                            'station': str(person.station)})
+    return HttpResponse(data_json, content_type='application/json')

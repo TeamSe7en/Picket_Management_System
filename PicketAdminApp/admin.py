@@ -5,7 +5,7 @@ from .models import Place, Picket, Spot, Task, Person
 class PicketAdmin(admin.ModelAdmin):
     #list_display = ['title', 'status']
     #ordering = ['title']
-    actions = ['offer_a_job', 'parse_place_list', 'parse_person_list']
+    actions = ['offer_a_job', 'parse_place_list', 'parse_person_list', 'set_allocation']
 
     def offer_a_job(self, request, queryset):
         for picket in queryset:
@@ -72,6 +72,15 @@ class PicketAdmin(admin.ModelAdmin):
         return_str = ", ".join(str(x) for x in picket.places.all())
         self.message_user(request, 'Места: ' + return_str)
     parse_place_list.short_description = "Добавить места пикета из файла"
+
+    def set_allocation(self,request, queryset):
+        for picket in queryset:
+            persons = picket.persons.all()
+            places = picket.places.all()
+            from Allocation import allocation
+            result = allocation.allocation(persons,places)
+            self.message_user(request, str (result))
+    set_allocation.short_description = "Распределить людей по местам"
 
 admin.site.register(Picket, PicketAdmin)
 admin.site.register(Person)
