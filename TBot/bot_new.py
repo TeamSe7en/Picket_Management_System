@@ -82,11 +82,11 @@ def survey_of_picketers(picket_date):
     r = requests.get(f"{server_url}/all_person/")
     list_of_id_user = r.json()["id_person"]
     #global last_survey_of_picketers_time
-    last_survey_of_picketers_time = time.time()
-    print(last_survey_of_picketers_time)
+    #last_survey_of_picketers_time = time.time()
+    #print(last_survey_of_picketers_time)
 
     for id_for_questoin in list_of_id_user:
-        sent = bot.send_message(id_for_questoin, "Готов завтра работать?", reply_markup=markup)
+        sent = bot.send_message(id_for_questoin,"Есть работа на "+picket_date+". Готов выйти в этот день?", reply_markup=markup)
         bot.register_next_step_handler(sent, answer_survey_of_picketers)
 
         if surveive_stack_time.get(id_for_questoin, -1) == -1:
@@ -149,6 +149,25 @@ def answer_survey_of_geolocation(message):
         #bot.register_next_step_handler(sent, answer_survey_of_geolocation)
 
 
+def picket_informing(json_data):
+    data = json.loads(json_data)
+    text = data['text']
+    date = data['date']
+
+    id_list = [id for id in data['spots'].keys()]
+    for id in id_list:
+        spot = data['spots'][id]
+        description = spot['description']
+        metro = spot['metro']
+        shortname = spot['shortname']
+        longitude = spot['longitude']
+        latitude = spot['latitude']
+        message_text = 'Сообщаю тебе об условиях проведения пикета. \n '+text+'\n'
+        message_text+= 'Твоя точка: '+shortname+'\n'
+        message_text+= 'Ближайшая станция метро: '+metro+'\n'
+        message_text+= 'Описание места: '+description+'\n'
+        message_text+= 'Координаты точки: '+str(latitude)+', '+str(longitude)+'\n'
+        bot.send_message(id, message_text)
 
 def try_polling():
     while True:
@@ -158,7 +177,8 @@ def try_polling():
             time.sleep(15)
 
 task_types = {
-    "poll_picket": survey_of_picketers
+    "poll_picket": survey_of_picketers,
+    "info_picket": picket_informing
 }
 
 
@@ -175,6 +195,7 @@ if __name__ == '__main__':
             task_func = task_types[task_type_name]
             task_id = r.json()["id"]
             print(task_id)
+            print(task_data)
             task_func(task_data)
             json_complete = {}
             json_complete['id'] = task_id

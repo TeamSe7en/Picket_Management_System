@@ -1,11 +1,12 @@
 from django.contrib import admin
 from .models import Place, Picket, Spot, Task, Person
+import json
 
 
 class PicketAdmin(admin.ModelAdmin):
     #list_display = ['title', 'status']
     #ordering = ['title']
-    actions = ['offer_a_job', 'parse_place_list', 'parse_person_list', 'set_allocation','inform_persons']
+    actions = ['parse_place_list', 'parse_person_list', 'offer_a_job', 'set_allocation','inform_persons']
 
     def offer_a_job(self, request, queryset):
         for picket in queryset:
@@ -14,6 +15,7 @@ class PicketAdmin(admin.ModelAdmin):
             for p in person_list:
                 id_list.append(p.telegram_id)
             task = Task.objects.get_or_create(name = 'poll_picket',
+                                              date = picket.date,
                                               data = str(picket.date))[0]
             task.status = True
             task.save()
@@ -97,12 +99,20 @@ class PicketAdmin(admin.ModelAdmin):
     def inform_persons(self, request, queryset):
         for picket in queryset:
             data = {}
-            data['date'] = picket.date
+            data['date'] = str(picket.date)
             data['text'] = picket.text
             data['spots'] = {}
             for spot in Spot.objects.filter(picket = picket):
-                data['spots'][spot.person] = spot.place
+                data['spots'][spot.person.telegram_id] = {}
+                data['spots'][spot.person.telegram_id]['description'] = spot.place.description
+                data['spots'][spot.person.telegram_id]['metro'] = spot.place.metro
+                data['spots'][spot.person.telegram_id]['shortname'] = spot.place.shortname
+                data['spots'][spot.person.telegram_id]['longitude'] = spot.place.longitude
+                data['spots'][spot.person.telegram_id]['latitude'] = spot.place.latitude
+
+            data = json.dumps(data)
             task = Task.objects.get_or_create(name='info_picket',
+                                              date = str(picket.date),
                                               data=str(data))[0]
             task.status = True
             task.save()
