@@ -17,8 +17,8 @@ surveive_stack_time = {}
 time_for_answer_to_picket = 15  #30 seconds
 
 bot = telebot.TeleBot(token)
-server_url = 'http://127.0.0.1:8000'
-#server_url = 'http://Se7enTeam.pythonanywhere.com'
+#server_url = 'http://127.0.0.1:8000'
+server_url = 'http://Se7enTeam.pythonanywhere.com'
 
 @bot.message_handler(commands=['aboutme'])
 def aboutme(message):

@@ -4,6 +4,11 @@ username: Se7enTeam
 emale: latsynn@mail.ru 
 password: 777
 
+***Putty***
+IP Address: 146.185.137.190
+Username: root
+Password: 123456789
+
 ***адрес web сайта
 http://se7enteam.pythonanywhere.com/admin/
 username: admin
