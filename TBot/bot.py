@@ -20,16 +20,21 @@ surveive_stack_time = {}
 time_for_answer_to_picket = 15  #30 seconds
 
 #Времена цикла геолокации
-picket_time = 50 #время длительности пикета и проверки геолокации
+picket_time = 150 #время длительности пикета и проверки геолокации
 time_for_answer_to_geo = 30 #время для ответа на геолокацию
 check_geo_time_interval_1 = 30 #случайный интервал проверки гео
 check_geo_time_interval_2 = 40
-
 geo_radius = 0.003 #радиус для проверки геолокации
+absence_count = 3 #количество допустимых нарушений
+
+#Авторизация админа
+admin_password = '0000'
+admin_id = ''
+
 
 bot = telebot.TeleBot(token)
-server_url = 'http://127.0.0.1:8000'
-#server_url = 'http://Se7enTeam.pythonanywhere.com'
+#server_url = 'http://127.0.0.1:8000'
+server_url = 'http://Se7enTeam.pythonanywhere.com'
 
 @bot.message_handler(commands=['aboutme'])
 def aboutme(message):
@@ -132,6 +137,7 @@ def answer_survey_of_picketers(message):
     else:
         surveive_stack_time[message.chat.id].pop(0)
 
+
 def check_geo(json_data):
     global users_location
     data = json.loads(json_data)
@@ -150,26 +156,33 @@ def check_geo(json_data):
                                                   request_location=True)
         keyboard.add(button_geo)
         for id_for_question in id_list:
-            sent = bot.send_message(id_for_question, "Проверка геолокации, жалкий человечишка!", reply_markup=keyboard)
+            sent = bot.send_message(id_for_question, "Внимание! Проверка геолокации. Подтвердите свою геопозицию", reply_markup=keyboard)
             bot.register_next_step_handler(sent, answer_survey_of_geolocation)
         time.sleep(time_for_answer_to_geo)#время для ответа
         for id_for_question in id_list:
+            surname = data['spots'][id_for_question]['surname']
+            name = data['spots'][id_for_question]['name']
+            phone = data['spots'][id_for_question]['phone']
             if id_for_question not in users_location.keys():
                 hide_markup = telebot.types.ReplyKeyboardRemove()
                 fine_list[id_for_question] += 1
-                sent = bot.send_message(id_for_question, "Тебе стоит отвечать на мои запросы.",reply_markup=hide_markup)
+                sent = bot.send_message(id_for_question, name+ ", тебе стоит отвечать на мои запросы.",reply_markup=hide_markup)
                 bot.clear_step_handler(sent)
             elif abs(users_location[id_for_question]['longitude'] - data['spots'][id_for_question]['longitude']) > geo_radius:
                 fine_list[id_for_question] += 1
-                sent = bot.send_message(id_for_question, "Ты немного отклонился от маршрута.")
+                sent = bot.send_message(id_for_question, name+ ", ты немного отклонился от маршрута.")
                 bot.clear_step_handler(sent)
             elif abs(users_location[id_for_question]['latitude'] - data['spots'][id_for_question]['latitude']) > geo_radius:
                 fine_list[id_for_question] += 1
-                sent = bot.send_message(id_for_question, "Ты немного отклонился от маршрута.")
+                sent = bot.send_message(id_for_question, name + ", ты немного отклонился от маршрута.")
                 bot.clear_step_handler(sent)
             else:
-                sent = bot.send_message(id_for_question, "Проверка окончена, Большой брат следит за тобой.")
+                sent = bot.send_message(id_for_question, "Проверка окончена. Большой брат следит за тобой.")
                 bot.clear_step_handler(sent)
+
+            if fine_list[id_for_question] >= absence_count:
+                global admin_id
+                bot.send_message(admin_id, 'Внимание! Пикетчик '+surname+' '+name+'.\n'+'Вы можете позвонить ему по телефону: +'+phone)
         users_location = {}
         print(fine_list)
         time.sleep(random.randint(check_geo_time_interval_1,check_geo_time_interval_2))#время повторного опроса
@@ -185,10 +198,6 @@ def check_geo(json_data):
     print(json_complete_finall)
 
 
-
-
-
-
 def answer_survey_of_geolocation(message):
     if message.content_type == 'location':
         if str(message.chat.id) in users_location.keys():
@@ -202,10 +211,6 @@ def answer_survey_of_geolocation(message):
     else:
         sent = bot.send_message(message.chat.id, "Сейчас не время для этого")
         bot.register_next_step_handler(sent, answer_survey_of_geolocation)
-
-
-
-
 
 
 def picket_informing(json_data):
@@ -230,6 +235,21 @@ def picket_informing(json_data):
             message_text += 'Описание места: ' + description + '\n'
             message_text += 'Координаты точки: ' + str(latitude) + ', ' + str(longitude) + '\n'
             bot.send_message(id, message_text)
+
+
+
+@bot.message_handler(commands=['iamadmin'])
+def start(message):
+    sent = bot.send_message(message.chat.id, 'Введи пароль админа:')
+    bot.register_next_step_handler(sent, get_password)
+
+def get_password(message):
+    input_password = message.text
+    if input_password == admin_password:
+        global admin_id
+        admin_id = message.chat.id
+        bot.send_message(message.chat.id, 'Теперь ты администратор')
+
 
 def try_polling():
     while True:

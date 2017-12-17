@@ -139,6 +139,11 @@ class PicketAdmin(admin.ModelAdmin):
                 data['spots'][spot.person.telegram_id]['latitude'] = spot.place.latitude
                 data['spots'][spot.person.telegram_id]['fine'] = spot.fine
                 data['spots'][spot.person.telegram_id]['id_spot'] = spot.id
+
+                data['spots'][spot.person.telegram_id]['surname'] = spot.person.surname
+                data['spots'][spot.person.telegram_id]['name'] = spot.person.name
+                data['spots'][spot.person.telegram_id]['phone'] = spot.person.phone
+
             data = json.dumps(data)
             task = Task.objects.get_or_create(name='geo_picket',
                                               date = str(picket.date),
