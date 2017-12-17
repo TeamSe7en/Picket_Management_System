@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.utils import timezone
-from .models import Picket, Task, Person,STATION_LIST
+from .models import Picket, Task, Person,STATION_LIST, Spot
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -26,6 +26,9 @@ def all_person(request):
     data_json = json.dumps({'id_person':data})
     return HttpResponse(data_json, content_type='application/json')
 
+
+
+
 @csrf_exempt
 def add_person(request):
     #data = request.POST.get()
@@ -34,7 +37,7 @@ def add_person(request):
     new_person = Person(telegram_id=info_to_add['person_id'],
         name=info_to_add['name'],
         surname=info_to_add['surname'])
-    new_person.patronymic=info_to_add['patronymic']
+    new_person.phone=info_to_add['phone']
 
     if STATION_LIST.count(info_to_add['metro']) == 0:
         for station in STATION_LIST:
@@ -93,6 +96,24 @@ def about_person(request):
     person = Person.objects.get(telegram_id=id_person)
     data_json = json.dumps({'name': person.name,
                             'surname': person.surname,
-                            'patronymic': person.patronymic,
+                            'phone': person.phone,
                             'station': str(person.station)})
     return HttpResponse(data_json, content_type='application/json')
+
+@csrf_exempt
+def picket_result(request):
+    info_to_completion = json.loads(request.body)
+    try:
+        fine_list = info_to_completion['fine']
+        for id_spot, spot_fine in fine_list.items():
+            one_spot = Spot.objects.get(id=id_spot)
+            one_spot.fine = spot_fine
+            one_spot.save()
+        print(info_to_completion)
+        return HttpResponse(status=200)
+    except Task.DoesNotExist:
+        print('нет задачи с этой датой')
+        return HttpResponse(status=520)
+    except Task.MultipleObjectsReturned:
+        print('существует несколько задач с этим id')
+        return HttpResponse(status=520)
