@@ -11,11 +11,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="bot.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="bot.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TBot/bot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="43" column="21" lean-forward="false" selection-start-line="43" selection-start-column="21" selection-end-line="43" selection-end-column="21" />
+            <state relative-caret-position="310">
+              <caret line="231" column="46" lean-forward="true" selection-start-line="231" selection-start-column="46" selection-end-line="231" selection-end-column="46" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -57,11 +57,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="admin.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="admin.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PicketAdminApp/admin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2125">
-              <caret line="151" column="25" lean-forward="false" selection-start-line="151" selection-start-column="25" selection-end-line="151" selection-end-column="25" />
+            <state relative-caret-position="107">
+              <caret line="108" column="45" lean-forward="true" selection-start-line="108" selection-start-column="45" selection-end-line="108" selection-end-column="45" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
               </folding>
@@ -94,6 +94,7 @@
       <find>check</find>
       <find>data</find>
       <find>send_message</find>
+      <find>geo_radius</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -133,11 +134,11 @@
         <option value="$PROJECT_DIR$/PicketAdminApp/TBot/config.py" />
         <option value="$PROJECT_DIR$/Allocation/allocation.py" />
         <option value="$PROJECT_DIR$/Allocation/metro_stations.py" />
-        <option value="$PROJECT_DIR$/PicketAdminApp/admin.py" />
         <option value="$PROJECT_DIR$/TBot/bot_new.py" />
         <option value="$PROJECT_DIR$/PicketAdminApp/urls.py" />
         <option value="$PROJECT_DIR$/PicketAdminApp/models.py" />
         <option value="$PROJECT_DIR$/PicketAdminApp/views.py" />
+        <option value="$PROJECT_DIR$/PicketAdminApp/admin.py" />
         <option value="$PROJECT_DIR$/TBot/bot.py" />
       </list>
     </option>
@@ -510,16 +511,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PicketAdminApp/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2125">
-          <caret line="151" column="25" lean-forward="false" selection-start-line="151" selection-start-column="25" selection-end-line="151" selection-end-column="25" />
-          <folding>
-            <element signature="e#0#32#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PicketAdminApp/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -551,10 +542,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/TBot/bot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="43" column="21" lean-forward="false" selection-start-line="43" selection-start-column="21" selection-end-line="43" selection-end-column="21" />
+        <state relative-caret-position="310">
+          <caret line="231" column="46" lean-forward="true" selection-start-line="231" selection-start-column="46" selection-end-line="231" selection-end-column="46" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PicketAdminApp/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="107">
+          <caret line="108" column="45" lean-forward="true" selection-start-line="108" selection-start-column="45" selection-end-line="108" selection-end-column="45" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
           </folding>
         </state>
       </provider>

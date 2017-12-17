@@ -103,12 +103,17 @@ class PicketAdmin(admin.ModelAdmin):
             data['text'] = picket.text
             data['spots'] = {}
             for spot in Spot.objects.filter(picket = picket):
-                data['spots'][spot.person.telegram_id] = {}
-                data['spots'][spot.person.telegram_id]['description'] = spot.place.description
-                data['spots'][spot.person.telegram_id]['metro'] = spot.place.metro
-                data['spots'][spot.person.telegram_id]['shortname'] = spot.place.shortname
-                data['spots'][spot.person.telegram_id]['longitude'] = spot.place.longitude
-                data['spots'][spot.person.telegram_id]['latitude'] = spot.place.latitude
+                if spot.person == None:
+                    pass
+                if spot.place == None:
+                    data['spots'][spot.person.telegram_id] = None
+                else:
+                    data['spots'][spot.person.telegram_id] = {}
+                    data['spots'][spot.person.telegram_id]['description'] = spot.place.description
+                    data['spots'][spot.person.telegram_id]['metro'] = spot.place.metro
+                    data['spots'][spot.person.telegram_id]['shortname'] = spot.place.shortname
+                    data['spots'][spot.person.telegram_id]['longitude'] = spot.place.longitude
+                    data['spots'][spot.person.telegram_id]['latitude'] = spot.place.latitude
 
             data = json.dumps(data)
             task = Task.objects.get_or_create(name='info_picket',

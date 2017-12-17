@@ -15,7 +15,17 @@ add_person = {}
 time_now = time.time()
 
 surveive_stack_time = {}
+
+#Время ответа на приглашение поработать
 time_for_answer_to_picket = 15  #30 seconds
+
+#Времена цикла геолокации
+picket_time = 50 #время длительности пикета и проверки геолокации
+time_for_answer_to_geo = 30 #время для ответа на геолокацию
+check_geo_time_interval_1 = 30 #случайный интервал проверки гео
+check_geo_time_interval_2 = 40
+
+geo_radius = 0.003 #радиус для проверки геолокации
 
 bot = telebot.TeleBot(token)
 server_url = 'http://127.0.0.1:8000'
@@ -88,9 +98,6 @@ def survey_of_picketers(picket_date):
     markup.row('да', 'нет')
     r = requests.get(f"{server_url}/all_person/")
     list_of_id_user = r.json()["id_person"]
-    #global last_survey_of_picketers_time
-    #last_survey_of_picketers_time = time.time()
-    #print(last_survey_of_picketers_time)
 
     for id_for_questoin in list_of_id_user:
         sent = bot.send_message(id_for_questoin,"Есть работа на "+picket_date+". Готов выйти в этот день?", reply_markup=markup)
@@ -133,11 +140,11 @@ def check_geo(json_data):
     id_list = [id for id in data['spots'].keys()]
     fine_list = {id:0 for id in data['spots'].keys()}
     for id in id_list:
-        message_text = 'Начинаем пикет, Ждем от тебя добросовестной работы.'
+        message_text = 'Начинаем пикет. Ждем от тебя добросовестной работы.'
         bot.send_message(id, message_text)
-    time.sleep(10)
+    time.sleep(10)#пауза перед опросом
     time_start = time.time()
-    while (time.time() - time_start ) < 50:
+    while (time.time() - time_start ) < picket_time:#время всего пикета
         keyboard = telebot.types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
         button_geo = telebot.types.KeyboardButton(text="Отправить местоположение",
                                                   request_location=True)
@@ -145,18 +152,18 @@ def check_geo(json_data):
         for id_for_question in id_list:
             sent = bot.send_message(id_for_question, "Проверка геолокации, жалкий человечишка!", reply_markup=keyboard)
             bot.register_next_step_handler(sent, answer_survey_of_geolocation)
-        time.sleep(30)
+        time.sleep(time_for_answer_to_geo)#время для ответа
         for id_for_question in id_list:
             if id_for_question not in users_location.keys():
                 hide_markup = telebot.types.ReplyKeyboardRemove()
                 fine_list[id_for_question] += 1
                 sent = bot.send_message(id_for_question, "Тебе стоит отвечать на мои запросы.",reply_markup=hide_markup)
                 bot.clear_step_handler(sent)
-            elif abs(users_location[id_for_question]['longitude'] - data['spots'][id_for_question]['longitude']) > 0.003:
+            elif abs(users_location[id_for_question]['longitude'] - data['spots'][id_for_question]['longitude']) > geo_radius:
                 fine_list[id_for_question] += 1
                 sent = bot.send_message(id_for_question, "Ты немного отклонился от маршрута.")
                 bot.clear_step_handler(sent)
-            elif abs(users_location[id_for_question]['latitude'] - data['spots'][id_for_question]['latitude']) > 0.003:
+            elif abs(users_location[id_for_question]['latitude'] - data['spots'][id_for_question]['latitude']) > geo_radius:
                 fine_list[id_for_question] += 1
                 sent = bot.send_message(id_for_question, "Ты немного отклонился от маршрута.")
                 bot.clear_step_handler(sent)
@@ -165,7 +172,7 @@ def check_geo(json_data):
                 bot.clear_step_handler(sent)
         users_location = {}
         print(fine_list)
-        time.sleep(random.randint(30,40))
+        time.sleep(random.randint(check_geo_time_interval_1,check_geo_time_interval_2))#время повторного опроса
     for id in id_list:
         message_text = 'Пикет окончен. До новых встреч.'
         bot.send_message(id, message_text)
@@ -193,7 +200,7 @@ def answer_survey_of_geolocation(message):
             users_location[str(message.chat.id)]['latitude'] = message.location.latitude
             bot.send_message(message.chat.id, "Ответ принят", reply_markup=hide_markup)
     else:
-        bot.send_message(message.chat.id, "Сейчас не время для этого")
+        sent = bot.send_message(message.chat.id, "Сейчас не время для этого")
         bot.register_next_step_handler(sent, answer_survey_of_geolocation)
 
 
@@ -209,17 +216,20 @@ def picket_informing(json_data):
     id_list = [id for id in data['spots'].keys()]
     for id in id_list:
         spot = data['spots'][id]
-        description = spot['description']
-        metro = spot['metro']
-        shortname = spot['shortname']
-        longitude = spot['longitude']
-        latitude = spot['latitude']
-        message_text = 'Сообщаю тебе об условиях проведения пикета. \n '+text+'\n'
-        message_text+= 'Твоя точка: '+shortname+'\n'
-        message_text+= 'Ближайшая станция метро: '+metro+'\n'
-        message_text+= 'Описание места: '+description+'\n'
-        message_text+= 'Координаты точки: '+str(latitude)+', '+str(longitude)+'\n'
-        bot.send_message(id, message_text)
+        if spot == None:
+            bot.send_message(id, 'К сожалению, тебе не хватило места =( Может в следующий раз повезет...')
+        else:
+            description = spot['description']
+            metro = spot['metro']
+            shortname = spot['shortname']
+            longitude = spot['longitude']
+            latitude = spot['latitude']
+            message_text = 'Сообщаю тебе об условиях проведения пикета. \n ' + text + '\n'
+            message_text += 'Твоя точка: ' + shortname + '\n'
+            message_text += 'Ближайшая станция метро: ' + metro + '\n'
+            message_text += 'Описание места: ' + description + '\n'
+            message_text += 'Координаты точки: ' + str(latitude) + ', ' + str(longitude) + '\n'
+            bot.send_message(id, message_text)
 
 def try_polling():
     while True:
