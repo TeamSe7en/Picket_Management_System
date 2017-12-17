@@ -37,7 +37,7 @@ def add_person(request):
     new_person = Person(telegram_id=info_to_add['person_id'],
         name=info_to_add['name'],
         surname=info_to_add['surname'])
-    new_person.patronymic=info_to_add['patronymic']
+    new_person.phone=info_to_add['phone']
 
     if STATION_LIST.count(info_to_add['metro']) == 0:
         for station in STATION_LIST:
@@ -96,7 +96,7 @@ def about_person(request):
     person = Person.objects.get(telegram_id=id_person)
     data_json = json.dumps({'name': person.name,
                             'surname': person.surname,
-                            'patronymic': person.patronymic,
+                            'phone': person.phone,
                             'station': str(person.station)})
     return HttpResponse(data_json, content_type='application/json')
 

@@ -28,11 +28,12 @@ def aboutme(message):
     r = requests.post(f"{server_url}/about_person/",json = json)
     name = r.json()['name']
     surname = r.json()['surname']
-    patronymic = r.json()['patronymic']
+    phone = r.json()['phone']
     station = r.json()['station']
     bot.send_message(message.chat.id,'Ты зарегистрирован как: '+
-                                        surname + ' '+name+ ' '+patronymic+
-                                        '. Ближайшая станция метро: '+station)
+                                        surname + ' '+name+ '\n'+
+                                        'Твой телефон: '+str(phone)+'\n'+
+                                        'Ближайшая станция метро: '+station)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -46,20 +47,25 @@ def get_surname(message):
     add_person[message.chat.id]['name'] = message.text
     sent = bot.send_message(message.chat.id,
                             'Привет, {name}. Рад тебя видеть. Скажи свою фамилию?'.format(name=message.text))
-    bot.register_next_step_handler(sent, get_patronymic)
+    bot.register_next_step_handler(sent, get_phone)
 
 
-def get_patronymic(message):
+def get_phone(message):
     add_person[message.chat.id]['surname'] = message.text
-    sent = bot.send_message(message.chat.id,
-                            'Хорошо, скажи свое отчество?')
+    keyboard = telebot.types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+    button_phone = telebot.types.KeyboardButton(text="Отправить номер телефона", request_contact=True)
+    keyboard.add(button_phone)
+    sent = bot.send_message(message.chat.id, "Отправь мне свой номер телефона.", reply_markup=keyboard)
     bot.register_next_step_handler(sent, get_metro)
 
 def get_metro(message):
-    add_person[message.chat.id]['patronymic'] = message.text
+    add_person[message.chat.id]['phone'] = message.contact.phone_number
+    hide_markup = telebot.types.ReplyKeyboardRemove()
     sent = bot.send_message(message.chat.id,
-                            'Хорошо, теперь скажи возле какого метро живешь?')
+                            'Хорошо, теперь скажи возле какого метро живешь?', reply_markup=hide_markup)
     bot.register_next_step_handler(sent, finall)
+
+
 
 def finall(message):
     add_person[message.chat.id]['metro'] = message.text

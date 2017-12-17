@@ -37,7 +37,7 @@ class Person(models.Model):
     telegram_id = models.BigIntegerField(primary_key = True)
     name = models.CharField(max_length=20)
     surname = models.CharField(max_length=20)
-    patronymic = models.CharField(max_length=20, null = True, blank=True)
+    phone = models.CharField(max_length=20, null = True, blank=True)
     station = models.CharField(max_length=50, null=True, blank=True, choices= STATION_LIST)
 
     def __str__(self):
