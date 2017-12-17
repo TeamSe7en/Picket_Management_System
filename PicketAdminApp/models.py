@@ -71,12 +71,13 @@ class Picket(models.Model):
 
 
 class Spot(models.Model):
+    id = models.AutoField(primary_key=True)
     #person = models.ForeignKey(Person, db_constraint = False, null=True, blank=True)
     person = models.ForeignKey(Person, blank=True,null=True)
     #person = models.ManyToOneRel(Person)
     picket = models.ForeignKey(Picket)
     place = models.ForeignKey(Place,blank=True,null=True)
-
+    fine = models.IntegerField(default=0)
     def __str__(self):
         if self.person == None:
             return str('Не назначено')+' / '+str(self.picket.date)+' / '+str(self.place.shortname)

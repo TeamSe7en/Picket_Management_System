@@ -6,7 +6,7 @@ import json
 class PicketAdmin(admin.ModelAdmin):
     #list_display = ['title', 'status']
     #ordering = ['title']
-    actions = ['parse_place_list', 'parse_person_list', 'offer_a_job', 'set_allocation','inform_persons']
+    actions = ['parse_place_list', 'parse_person_list', 'offer_a_job', 'set_allocation','inform_persons','check_geo']
 
     def offer_a_job(self, request, queryset):
         for picket in queryset:
@@ -118,6 +118,30 @@ class PicketAdmin(admin.ModelAdmin):
             task.save()
         self.message_user(request, 'Разослана информация о пикете: ' + task.data)
     inform_persons.short_description = "Сообщить условия пикета"
+
+    def check_geo(self, request, queryset):
+        for picket in queryset:
+            data = {}
+            data['date'] = str(picket.date)
+            data['text'] = picket.text
+            data['spots'] = {}
+            for spot in Spot.objects.filter(picket = picket):
+                data['spots'][spot.person.telegram_id] = {}
+                data['spots'][spot.person.telegram_id]['description'] = spot.place.description
+                data['spots'][spot.person.telegram_id]['metro'] = spot.place.metro
+                data['spots'][spot.person.telegram_id]['shortname'] = spot.place.shortname
+                data['spots'][spot.person.telegram_id]['longitude'] = spot.place.longitude
+                data['spots'][spot.person.telegram_id]['latitude'] = spot.place.latitude
+                data['spots'][spot.person.telegram_id]['fine'] = spot.fine
+                data['spots'][spot.person.telegram_id]['id_spot'] = spot.id
+            data = json.dumps(data)
+            task = Task.objects.get_or_create(name='geo_picket',
+                                              date = str(picket.date),
+                                              data=str(data))[0]
+            task.status = True
+            task.save()
+        self.message_user(request, 'Пикет начат: ' + task.data)
+    check_geo.short_description = "Начать пикет"
 
 
 admin.site.register(Picket, PicketAdmin)

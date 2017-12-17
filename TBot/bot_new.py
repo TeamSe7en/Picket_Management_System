@@ -4,6 +4,7 @@ import time
 import requests
 import json
 import threading
+import random
 
 token = '496675869:AAEh3Y-XKUe4eJNcMNXY0rzvOEKbcqRxxC8'
 id = ['190120461','481050042']#, '276795899']  # ,'147572829','190120461']##,'90527817']#,'74534494']
@@ -118,35 +119,80 @@ def answer_survey_of_picketers(message):
     else:
         surveive_stack_time[message.chat.id].pop(0)
 
+def check_geo(json_data):
+    global users_location
+    data = json.loads(json_data)
+    text = data['text']
+    date = data['date']
+    id_list = [id for id in data['spots'].keys()]
+    fine_list = {id:0 for id in data['spots'].keys()}
+    for id in id_list:
+        message_text = 'Начинаем пикет, Ждем от тебя добросовестной работы.'
+        bot.send_message(id, message_text)
+    time.sleep(10)
+    time_start = time.time()
+    while (time.time() - time_start ) < 50:
+        keyboard = telebot.types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+        button_geo = telebot.types.KeyboardButton(text="Отправить местоположение",
+                                                  request_location=True)
+        keyboard.add(button_geo)
+        for id_for_question in id_list:
+            sent = bot.send_message(id_for_question, "Проверка геолокации, жалкий человечишка!", reply_markup=keyboard)
+            bot.register_next_step_handler(sent, answer_survey_of_geolocation)
+        time.sleep(30)
+        for id_for_question in id_list:
+            if id_for_question not in users_location.keys():
+                hide_markup = telebot.types.ReplyKeyboardRemove()
+                fine_list[id_for_question] += 1
+                sent = bot.send_message(id_for_question, "Тебе стоит отвечать на мои запросы.",reply_markup=hide_markup)
+                bot.clear_step_handler(sent)
+            elif abs(users_location[id_for_question]['longitude'] - data['spots'][id_for_question]['longitude']) > 0.003:
+                fine_list[id_for_question] += 1
+                sent = bot.send_message(id_for_question, "Ты немного отклонился от маршрута.")
+                bot.clear_step_handler(sent)
+            elif abs(users_location[id_for_question]['latitude'] - data['spots'][id_for_question]['latitude']) > 0.003:
+                fine_list[id_for_question] += 1
+                sent = bot.send_message(id_for_question, "Ты немного отклонился от маршрута.")
+                bot.clear_step_handler(sent)
+            else:
+                sent = bot.send_message(id_for_question, "Проверка окончена, Большой брат следит за тобой.")
+                bot.clear_step_handler(sent)
+        users_location = {}
+        print(fine_list)
+        time.sleep(random.randint(30,40))
+    for id in id_list:
+        message_text = 'Пикет окончен. До новых встреч.'
+        bot.send_message(id, message_text)
+    json_complete_finall = {}
+    json_complete_finall['id'] = task_id
+    json_complete_finall['fine'] = {}
+    for key_id_person, value_fine in fine_list.items():
+        json_complete_finall['fine'][data['spots'][key_id_person]['id_spot']] = value_fine
+    r = requests.post(f'{server_url}/picket_result/', json=json_complete_finall)
+    print(json_complete_finall)
 
-def survey_of_geolocation():
-    keyboard = telebot.types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-    button_geo = telebot.types.KeyboardButton(text="Отправить местоположение",
-                                           request_location=True)
-    keyboard.add(button_geo)
-    r = requests.get(f"{server_url}/data/")
-    list_of_id_user = r.json()["id_person"]
-    print(list_of_id_user)
-    for id_for_questoin in list_of_id_user:
-        sent = bot.send_message(id_for_questoin, "Проверка геолокации, жалкий человечишка!", reply_markup=keyboard)
-        bot.register_next_step_handler(sent, answer_survey_of_geolocation)
-    timer_for_polling(5, 3)
-    print(users_location)
+
+
+
+
 
 def answer_survey_of_geolocation(message):
     if message.content_type == 'location':
         if str(message.chat.id) in users_location.keys():
             bot.send_message(message.chat.id, "Вы уже присылали ответ")
         else:
-            hide_markup = bot.types.ReplyKeyboardRemove()
+            hide_markup = telebot.types.ReplyKeyboardRemove()
             users_location[str(message.chat.id)] = {}
             users_location[str(message.chat.id)]['longitude'] = message.location.longitude
             users_location[str(message.chat.id)]['latitude'] = message.location.latitude
-            users_location[str(message.chat.id)]['delay'] = time.time() - time_now
             bot.send_message(message.chat.id, "Ответ принят", reply_markup=hide_markup)
     else:
         bot.send_message(message.chat.id, "Сейчас не время для этого")
-        #bot.register_next_step_handler(sent, answer_survey_of_geolocation)
+        bot.register_next_step_handler(sent, answer_survey_of_geolocation)
+
+
+
+
 
 
 def picket_informing(json_data):
@@ -178,7 +224,8 @@ def try_polling():
 
 task_types = {
     "poll_picket": survey_of_picketers,
-    "info_picket": picket_informing
+    "info_picket": picket_informing,
+    "geo_picket": check_geo
 }
 
 
@@ -200,8 +247,9 @@ if __name__ == '__main__':
             json_complete = {}
             json_complete['id'] = task_id
             r = requests.post(f'{server_url}/task_complete/', json = json_complete)
+
             #requests.post(f'{server_url}/task_complete/', data=task_id)
-            print(r.status_code)
+            #print(r.status_code)
         else:
             print(r.status_code)
         # result = survey_of_picketers(config.id)
