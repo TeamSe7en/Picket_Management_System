@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import telebot
 from threading import Timer
 import time
