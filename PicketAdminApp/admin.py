@@ -105,7 +105,7 @@ class PicketAdmin(admin.ModelAdmin):
             for spot in Spot.objects.filter(picket = picket):
                 if spot.person == None:
                     pass
-                if spot.place == None:
+                elif spot.place == None:
                     data['spots'][spot.person.telegram_id] = None
                 else:
                     data['spots'][spot.person.telegram_id] = {}
@@ -131,18 +131,24 @@ class PicketAdmin(admin.ModelAdmin):
             data['text'] = picket.text
             data['spots'] = {}
             for spot in Spot.objects.filter(picket = picket):
-                data['spots'][spot.person.telegram_id] = {}
-                data['spots'][spot.person.telegram_id]['description'] = spot.place.description
-                data['spots'][spot.person.telegram_id]['metro'] = spot.place.metro
-                data['spots'][spot.person.telegram_id]['shortname'] = spot.place.shortname
-                data['spots'][spot.person.telegram_id]['longitude'] = spot.place.longitude
-                data['spots'][spot.person.telegram_id]['latitude'] = spot.place.latitude
-                data['spots'][spot.person.telegram_id]['fine'] = spot.fine
-                data['spots'][spot.person.telegram_id]['id_spot'] = spot.id
+                if spot.person == None:
+                    pass
+                elif spot.place == None:
+                    data['spots'][spot.person.telegram_id] = None
+                else:
+                    data['spots'][spot.person.telegram_id] = {}
+                    data['spots'][spot.person.telegram_id]['description'] = spot.place.description
+                    data['spots'][spot.person.telegram_id]['metro'] = spot.place.metro
+                    data['spots'][spot.person.telegram_id]['shortname'] = spot.place.shortname
+                    data['spots'][spot.person.telegram_id]['longitude'] = spot.place.longitude
+                    data['spots'][spot.person.telegram_id]['latitude'] = spot.place.latitude
+                    data['spots'][spot.person.telegram_id]['fine'] = spot.fine
+                    data['spots'][spot.person.telegram_id]['id_spot'] = spot.id
 
-                data['spots'][spot.person.telegram_id]['surname'] = spot.person.surname
-                data['spots'][spot.person.telegram_id]['name'] = spot.person.name
-                data['spots'][spot.person.telegram_id]['phone'] = spot.person.phone
+                    data['spots'][spot.person.telegram_id]['surname'] = spot.person.surname
+                    data['spots'][spot.person.telegram_id]['name'] = spot.person.name
+                    data['spots'][spot.person.telegram_id]['phone'] = spot.person.phone
+
 
             data = json.dumps(data)
             task = Task.objects.get_or_create(name='geo_picket',

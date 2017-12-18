@@ -20,7 +20,7 @@ surveive_stack_time = {}
 time_for_answer_to_picket = 15  #30 seconds
 
 #Времена цикла геолокации
-picket_time = 150 #время длительности пикета и проверки геолокации
+picket_time = 50 #время длительности пикета и проверки геолокации
 time_for_answer_to_geo = 30 #время для ответа на геолокацию
 check_geo_time_interval_1 = 30 #случайный интервал проверки гео
 check_geo_time_interval_2 = 40
@@ -33,8 +33,8 @@ admin_id = ''
 
 
 bot = telebot.TeleBot(token)
-#server_url = 'http://127.0.0.1:8000'
-server_url = 'http://Se7enTeam.pythonanywhere.com'
+server_url = 'http://127.0.0.1:8000'
+#server_url = 'http://Se7enTeam.pythonanywhere.com'
 
 @bot.message_handler(commands=['aboutme'])
 def aboutme(message):
@@ -143,8 +143,9 @@ def check_geo(json_data):
     data = json.loads(json_data)
     text = data['text']
     date = data['date']
-    id_list = [id for id in data['spots'].keys()]
-    fine_list = {id:0 for id in data['spots'].keys()}
+    print(data)
+    id_list = [id for id in data['spots'].keys() if id!=None and data['spots'][id]!=None]
+    fine_list = {id:0 for id in data['spots'].keys() if id!=None and data['spots'][id]!=None}
     for id in id_list:
         message_text = 'Начинаем пикет. Ждем от тебя добросовестной работы.'
         bot.send_message(id, message_text)
