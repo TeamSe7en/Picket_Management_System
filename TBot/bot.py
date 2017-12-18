@@ -128,6 +128,11 @@ def survey_of_picketers(picket_date):
     json['picket_date'] = picket_date
     requests.post(f'{server_url}/person_for_picket/', json = json)
 
+    try:
+        bot.send_message(admin_id,'Опрос людей для пикета на '+str(picket_date)+' завершен.')
+    except:
+        pass
+
     print(json)
 
 def answer_survey_of_picketers(message):
@@ -205,6 +210,10 @@ def check_geo(json_data):
         json_complete_finall['fine'][data['spots'][key_id_person]['id_spot']] = value_fine
     r = requests.post(f'{server_url}/picket_result/', json=json_complete_finall)
     print(json_complete_finall)
+    try:
+        bot.send_message(admin_id,'Пикета '+str(picket_date)+' завершен.')
+    except:
+        pass
 
 
 def answer_survey_of_geolocation(message):

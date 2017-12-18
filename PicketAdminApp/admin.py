@@ -81,7 +81,7 @@ class PicketAdmin(admin.ModelAdmin):
             places = picket.places.all()
             from Allocation import allocation
             result = allocation.allocation(persons,places)
-            self.message_user(request, str (result))
+            self.message_user(request, 'Выполнено распределение людей по местам для пикета: '+ str(picket))
 
             #запись в Spot
             matches = result['matches']
@@ -121,7 +121,7 @@ class PicketAdmin(admin.ModelAdmin):
                                               data=str(data))[0]
             task.status = True
             task.save()
-        self.message_user(request, 'Разослана информация о пикете: ' + task.data)
+            self.message_user(request, 'Разослана информация о пикете: ' + str(picket))
     inform_persons.short_description = "Сообщить условия пикета"
 
     def check_geo(self, request, queryset):
@@ -156,7 +156,7 @@ class PicketAdmin(admin.ModelAdmin):
                                               data=str(data))[0]
             task.status = True
             task.save()
-        self.message_user(request, 'Пикет начат: ' + task.data)
+            self.message_user(request, 'Начало пикета: ' + str(picket))
     check_geo.short_description = "Начать пикет"
 
 
