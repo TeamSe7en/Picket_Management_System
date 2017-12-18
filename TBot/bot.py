@@ -213,7 +213,7 @@ def check_geo(json_data):
     r = requests.post(f'{server_url}/picket_result/', json=json_complete_finall)
     print(json_complete_finall)
     try:
-        bot.send_message(admin_id,'Пикета '+str(picket_date)+' завершен.')
+        bot.send_message(admin_id,'Пикета '+str(date)+' завершен.')
     except:
         pass
 

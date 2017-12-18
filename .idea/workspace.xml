@@ -14,8 +14,8 @@
       <file leaf-file-name="bot.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/TBot/bot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-238">
-              <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+            <state relative-caret-position="340">
+              <caret line="215" column="52" lean-forward="false" selection-start-line="215" selection-start-column="52" selection-end-line="215" selection-end-column="52" />
               <folding>
                 <element signature="e#25#39#0" expanded="true" />
               </folding>
@@ -58,8 +58,8 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PicketAdminApp/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="629">
-              <caret line="39" column="21" lean-forward="false" selection-start-line="39" selection-start-column="21" selection-end-line="39" selection-end-column="21" />
+            <state relative-caret-position="329">
+              <caret line="69" column="29" lean-forward="false" selection-start-line="69" selection-start-column="29" selection-end-line="69" selection-end-column="29" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
               </folding>
@@ -144,11 +144,11 @@
         <option value="$PROJECT_DIR$/PicketAdminApp/TBot/config.py" />
         <option value="$PROJECT_DIR$/Allocation/allocation.py" />
         <option value="$PROJECT_DIR$/TBot/bot_new.py" />
-        <option value="$PROJECT_DIR$/PicketAdminApp/models.py" />
         <option value="$PROJECT_DIR$/PicketAdminApp/urls.py" />
         <option value="$PROJECT_DIR$/PicketAdminApp/views.py" />
         <option value="$PROJECT_DIR$/PicketAdminApp/admin.py" />
         <option value="$PROJECT_DIR$/Allocation/metro_stations.py" />
+        <option value="$PROJECT_DIR$/PicketAdminApp/models.py" />
         <option value="$PROJECT_DIR$/TBot/bot.py" />
       </list>
     </option>
@@ -515,16 +515,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/TBot/bot_new.py" />
-    <entry file="file://$PROJECT_DIR$/PicketAdminApp/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="629">
-          <caret line="39" column="21" lean-forward="false" selection-start-line="39" selection-start-column="21" selection-end-line="39" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PicketAdminApp/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
@@ -561,10 +551,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/PicketAdminApp/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="69" column="29" lean-forward="false" selection-start-line="69" selection-start-column="29" selection-end-line="69" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/TBot/bot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-238">
-          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+        <state relative-caret-position="340">
+          <caret line="215" column="52" lean-forward="false" selection-start-line="215" selection-start-column="52" selection-end-line="215" selection-end-column="52" />
           <folding>
             <element signature="e#25#39#0" expanded="true" />
           </folding>
