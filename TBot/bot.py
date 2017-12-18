@@ -81,7 +81,6 @@ def get_metro(message):
     bot.register_next_step_handler(sent, finall)
 
 
-
 def finall(message):
     add_person[message.chat.id]['metro'] = message.text
     print(add_person[message.chat.id])
@@ -89,6 +88,15 @@ def finall(message):
     requests.post(f'{server_url}/add_person/', json = add_person[message.chat.id])
     bot.send_message(message.chat.id,'Классно что ты хочешь работать с нами! Мы обязательно сообщим тебе о следующем пикете.')
     del add_person[message.chat.id]
+
+@bot.message_handler(commands=['bye'])
+def delete_person(message):
+    json = {}
+    json['id']= message.chat.id
+    requests.post(f'{server_url}/del_person/', json=json)
+    bot.send_message(message.chat.id,
+                     'Очень жаль, что ты больше не хочешь работать с нами. Теперь мы не сможем сообщать тебе о пикетах.')
+
 
 def timer_for_polling(time=300, interval_polling=3):
     breaker = Timer(time, bot.stop_polling)

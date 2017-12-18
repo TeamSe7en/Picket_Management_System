@@ -56,6 +56,14 @@ def add_person(request):
     return HttpResponse(status=200)
 
 @csrf_exempt
+def del_person(request):
+    info_to_del = json.loads(request.body)
+    del_id = info_to_del['id']
+    Person.objects.filter(telegram_id = del_id).delete()
+
+
+
+@csrf_exempt
 def set_person_for_picket(request):
     info_to_set = json.loads(request.body)
     try:
