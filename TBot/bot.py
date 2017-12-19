@@ -35,8 +35,8 @@ admin_id = ''
 
 
 bot = telebot.TeleBot(token)
-server_url = 'http://0.0.0.0:80'
-#server_url = 'http://Se7enTeam.pythonanywhere.com'
+#server_url = 'http://127.0.0.1:8000'
+server_url = 'http://Se7enTeam.pythonanywhere.com'
 
 @bot.message_handler(commands=['aboutme'])
 def aboutme(message):
